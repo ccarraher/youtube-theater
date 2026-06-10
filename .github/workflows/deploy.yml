@@ -2,6 +2,10 @@ name: Deploy images
 on:
   push:
     branches: [main]
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -30,25 +34,40 @@ jobs:
       - name: Log in to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 1200
 
-      - name: Build and push images
+      - name: Generate compose + build images
         env:
           Parameters__RegistryEndpoint: registry.digitalocean.com
           Parameters__RegistryRepository: yt-theater-container-registry
+        run: aspire do prepare-prod -o ./deploy-out
+
+      - name: Push images
         run: aspire do push
+
+      - name: Upload deploy artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-out
+          path: ./deploy-out
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Download deploy artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-out
+          path: ./deploy-out
+
       - name: Copy compose file to droplet
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "docker-compose.prod.yml"
+          source: "deploy-out/docker-compose.yaml"
           target: "~/youtube-app"
+          strip_components: 1
 
       - name: Deploy on droplet
         uses: appleboy/ssh-action@v1
