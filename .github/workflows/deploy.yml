@@ -51,7 +51,7 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           passphrase: ${{ secrets.DROPLET_SSH_KEY_PASSPHRASE }}
           port: 9090
-          source: "deploy-out/docker-compose.yaml,deploy-out/.env"
+          source: "deploy-out/docker-compose.yaml,deploy-out/.env,deploy-out/.env.Production"
           target: "~/youtube-app"
           strip_components: 1
 
@@ -67,7 +67,7 @@ jobs:
           script: |
             cd ~/youtube-app
             echo "$DO_TOKEN" | docker login registry.digitalocean.com -u "$DO_TOKEN" --password-stdin
-            docker compose pull
-            docker compose up -d
+            docker compose --env-file .env --env-file .env.Production pull
+            docker compose --env-file .env --env-file .env.Production up -d
         env:
           DO_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
