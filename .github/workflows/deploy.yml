@@ -12,28 +12,28 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
-          
+          dotnet-version: "10.0.x"
+
       - name: Install Aspire CLI
         run: |
           curl -sSL https://aspire.dev/install.sh | bash
           echo "$HOME/.aspire/bin" >> $GITHUB_PATH
-          
+
       - name: Output Aspire CLI version
         run: aspire --version
-        
+
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          
+
       - name: Log in to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 1200
-        
+
       - name: Build and push images
         env:
-          REGISTRY_ENDPOINT: registry.digitalocean.com
-          REGISTRY_REPOSITORY: yt-theater-container-registry
+          Parameters__RegistryEndpoint: registry.digitalocean.com
+          Parameters__RegistryRepository: yt-theater-container-registry
         run: aspire do push
 
   deploy:
@@ -49,7 +49,7 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           source: "docker-compose.prod.yml"
           target: "~/youtube-app"
-          
+
       - name: Deploy on droplet
         uses: appleboy/ssh-action@v1
         with:
