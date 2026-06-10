@@ -1,5 +1,5 @@
 {
   "appHost": {
-    "path": "youtube-theater.AppHost/youtube-theater.AppHost.csproj"
+    "path": "YTTheater.AppHost/YTTheater.AppHost.csproj"
   }
 }
