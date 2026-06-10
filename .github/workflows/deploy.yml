@@ -65,7 +65,7 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          passphrase: ${{ secrets.DROPLET_SSH__KEY_PASSPHRASE }}
+          passphrase: ${{ secrets.DROPLET_SSH_KEY_PASSPHRASE }}
           port: 9090
           source: "deploy-out/docker-compose.yaml"
           target: "~/youtube-app"
@@ -77,7 +77,7 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          passphrase: ${{ secrets.DROPLET_SSH__KEY_PASSPHRASE }}
+          passphrase: ${{ secrets.DROPLET_SSH_KEY_PASSPHRASE }}
           port: 9090
           envs: DO_TOKEN
           script: |
