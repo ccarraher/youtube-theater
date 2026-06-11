@@ -25,7 +25,12 @@ if (builder.ExecutionContext.IsPublishMode)
 
     server.PublishWithContainerFiles(webfrontend, "wwwroot");
 
-    var tunnelToken = builder.AddParameter("CloudflaredTunnelToken", secret: true);
+    var tunnelToken = await builder.AddParameter("CloudflaredTunnelToken", secret: true).Resource.GetValueAsync(CancellationToken.None);
+    if (tunnelToken == null)
+    {
+        throw new ArgumentNullException("Cloudflare Tunnel Token was null. Check that it is configured correctly.");
+    }
+
     builder.AddContainer("cloudflared", "cloudflare/cloudflared", "latest")
         .WithArgs("tunnel", "--no-autoupdate", "run", "--token", tunnelToken)
         .WaitFor(server);
