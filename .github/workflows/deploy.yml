@@ -35,6 +35,7 @@ jobs:
         env:
           Parameters__RegistryEndpoint: registry.digitalocean.com
           Parameters__RegistryRepository: yt-theater-container-registry
+          Parameters__CloudflareTunnelToken: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
         run: aspire do prepare-prod -o ./deploy-out
 
       - name: Push images
