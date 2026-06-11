@@ -4,7 +4,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var server = builder.AddProject<Projects.YTTheater_Server>("server")
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .WithHttpEndpoint(name: "http", targetPort: 8080);
 
 var webfrontend = builder.AddViteApp("webfrontend", "../frontend")
     .WithReference(server)
@@ -25,14 +26,11 @@ if (builder.ExecutionContext.IsPublishMode)
 
     server.PublishWithContainerFiles(webfrontend, "wwwroot");
 
-    var tunnelToken = await builder.AddParameter("CloudflareTunnelToken", secret: true).Resource.GetValueAsync(CancellationToken.None);
-    if (tunnelToken == null)
-    {
-        throw new ArgumentNullException("Cloudflare Tunnel Token was null. Check that it is configured correctly.");
-    }
+    var tunnelToken = builder.AddParameter("CloudflareTunnelToken", secret: true);
 
     builder.AddContainer("cloudflared", "cloudflare/cloudflared", "latest")
-        .WithArgs("tunnel", "--no-autoupdate", "run", "--token", tunnelToken)
+        .WithArgs("tunnel", "--no-autoupdate", "run")
+        .WithEnvironment("TUNNEL_TOKEN", tunnelToken)
         .WaitFor(server);
 }
 
